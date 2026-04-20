@@ -19,7 +19,7 @@ const sdgNames = {
 // ══════════════════════════════════════════════════════════
 // ⚠️ ใส่ URL จาก Google Apps Script Web App ตรงนี้
 // ══════════════════════════════════════════════════════════
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAtKtpCMr1jvymTh3RjJC8r5z5kdJQUjnZEkNd0V6tNzOmFresiShXbt7hk7CwVwdN/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3CA_Xqgay603ZDkQt2Ja5DLg0CmvtHrDWjG-pIFKzbRXto32V_WGsjMmnkpXIGSsC/exec';
 
 let selectedSdgs = [];
 let activityCounter = 0; // internal counter for unique IDs
@@ -157,7 +157,9 @@ function updateSdgPreview() {
 // ── LIVE PREVIEW UPDATE ──
 function updatePreview() {
   const who = document.getElementById('kku_unit').value || 'คณะ / หน่วยงาน มข.';
-  const withWho = document.getElementById('partner_name').value || 'พันธมิตร';
+  const partnerFields = ['partner_gov','partner_private','partner_edu','partner_intl','partner_ngo','partner_community'];
+  const partners = partnerFields.map(id => document.getElementById(id).value).filter(v => v.trim());
+  const withWho = partners.length > 0 ? partners.join(', ') : 'พันธมิตร';
   const result = document.getElementById('key_achievement').value || 'ผลที่เกิดขึ้น...';
   document.getElementById('preWho').textContent = who;
   document.getElementById('preWith').textContent = withWho;
@@ -174,8 +176,7 @@ function updateProgressSteps() {
       check: () => {
         return !!(
           document.getElementById('mou_title').value.trim() &&
-          document.getElementById('kku_unit').value.trim() &&
-          document.getElementById('partner_name').value.trim()
+          document.getElementById('kku_unit').value.trim()
         );
       }
     },
@@ -253,7 +254,6 @@ function validateForm() {
     { id: 'mou_title', name: 'ชื่อโครงการ' },
     { id: 'kku_unit', name: 'คณะ/หน่วยงาน มข.' },
     { id: 'lead_person', name: 'ผู้รับผิดชอบโครงการ' },
-    { id: 'partner_name', name: 'องค์กรภาคี/พันธมิตร' },
     { id: 'mou_objective', name: 'วัตถุประสงค์หลัก' },
     { id: 'key_achievement', name: 'ผลลัพธ์สำคัญ' }
   ];
@@ -313,8 +313,13 @@ function generateOutput() {
   const title = document.getElementById('mou_title').value || '(ยังไม่ได้ระบุชื่อโครงการ)';
   const kku = document.getElementById('kku_unit').value || 'มหาวิทยาลัยขอนแก่น';
   const leadPerson = document.getElementById('lead_person').value;
-  const partner = document.getElementById('partner_name').value || '—';
-  const partnerType = document.getElementById('partner_type').value;
+  const partnerGov = document.getElementById('partner_gov').value;
+  const partnerPrivate = document.getElementById('partner_private').value;
+  const partnerEdu = document.getElementById('partner_edu').value;
+  const partnerIntl = document.getElementById('partner_intl').value;
+  const partnerNgo = document.getElementById('partner_ngo').value;
+  const partnerCommunity = document.getElementById('partner_community').value;
+  const allPartners = [partnerGov, partnerPrivate, partnerEdu, partnerIntl, partnerNgo, partnerCommunity].filter(v => v.trim());
   const partnerLevel = document.getElementById('partner_level').value;
   const mouDate = document.getElementById('mou_date').value;
   const mouDuration = document.getElementById('mou_duration').value;
@@ -340,7 +345,7 @@ function generateOutput() {
   // ── Render Title ──
   document.getElementById('op_title').textContent = title;
   document.getElementById('op_partners').innerHTML =
-    `<strong>${kku}</strong> ${partner ? '× ' + partner : ''} ${partnerType ? '(' + partnerType + ')' : ''}`;
+    `<strong>${kku}</strong> ${allPartners.length > 0 ? '× ' + allPartners.join(', ') : ''}`;
 
   // ── Year ──
   if (mouDate) {
@@ -529,8 +534,12 @@ function collectAllData() {
     mou_title: document.getElementById('mou_title').value,
     kku_unit: document.getElementById('kku_unit').value,
     lead_person: document.getElementById('lead_person').value,
-    partner_name: document.getElementById('partner_name').value,
-    partner_type: document.getElementById('partner_type').value,
+    partner_gov: document.getElementById('partner_gov').value,
+    partner_private: document.getElementById('partner_private').value,
+    partner_edu: document.getElementById('partner_edu').value,
+    partner_intl: document.getElementById('partner_intl').value,
+    partner_ngo: document.getElementById('partner_ngo').value,
+    partner_community: document.getElementById('partner_community').value,
     partner_level: document.getElementById('partner_level').value,
     mou_date: document.getElementById('mou_date').value,
     mou_duration: document.getElementById('mou_duration').value,
@@ -625,8 +634,12 @@ function loadExample() {
   document.getElementById('mou_title').value = 'โครงการพัฒนาระบบสุขภาพชุมชนอัจฉริยะ Smart Health Community อีสาน';
   document.getElementById('kku_unit').value = 'คณะแพทยศาสตร์ มหาวิทยาลัยขอนแก่น';
   document.getElementById('lead_person').value = 'ศ.ดร.นพ.สมศักดิ์ ตัวอย่าง (คณบดี)';
-  document.getElementById('partner_name').value = 'สำนักงานสาธารณสุขจังหวัดขอนแก่น';
-  document.getElementById('partner_type').value = 'ภาครัฐ (หน่วยงานราชการ)';
+  document.getElementById('partner_gov').value = 'สำนักงานสาธารณสุขจังหวัดขอนแก่น';
+  document.getElementById('partner_private').value = '';
+  document.getElementById('partner_edu').value = '';
+  document.getElementById('partner_intl').value = 'WHO ประจำประเทศไทย';
+  document.getElementById('partner_ngo').value = '';
+  document.getElementById('partner_community').value = 'อสม. เครือข่ายตำบลบ้านค้อ';
   document.getElementById('partner_level').value = 'ระดับภูมิภาค (อีสาน)';
   document.getElementById('mou_date').value = '2025-06-15';
   document.getElementById('mou_duration').value = '3 ปี';
