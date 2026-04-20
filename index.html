@@ -109,46 +109,61 @@
         <input type="text" id="mou_title" placeholder="เช่น โครงการพัฒนาชุมชนสีเขียวด้านพลังงานสะอาด" oninput="updatePreview()">
         <div class="error-msg">กรุณากรอกชื่อโครงการ</div>
       </div>
-      <div class="field-row">
-        <div class="field-group">
-          <label>คณะ / หน่วยงาน มข. <span class="req">*</span><span class="hint">(ผู้ดำเนินการหลัก)</span></label>
-          <input type="text" id="kku_unit" placeholder="เช่น คณะวิศวกรรมศาสตร์ มข." oninput="updatePreview()">
-          <div class="error-msg">กรุณากรอกคณะ/หน่วยงาน</div>
-        </div>
-        <div class="field-group">
-          <label>ผู้รับผิดชอบโครงการ <span class="req">*</span></label>
-          <input type="text" id="lead_person" placeholder="เช่น รศ.ดร.ชื่อ นามสกุล">
-          <div class="error-msg">กรุณากรอกผู้รับผิดชอบ</div>
-        </div>
+      <div class="field-group">
+        <label>คณะ / หน่วยงาน มข. <span class="req">*</span><span class="hint">(ผู้ดำเนินการหลัก สามารถกรอกได้มากกว่า 1 คณะ / หน่วยงาน)</span></label>
+        <textarea id="kku_unit" rows="2" placeholder="เช่น คณะวิศวกรรมศาสตร์, คณะวิทยาศาสตร์ (คั่นด้วยเครื่องหมาย , หรือขึ้นบรรทัดใหม่)" oninput="updatePreview()"></textarea>
+        <div class="error-msg">กรุณากรอกคณะ/หน่วยงาน</div>
       </div>
       <div class="field-group">
-        <label>องค์กรภาคี / พันธมิตร <span class="req">*</span><span class="hint">(หน่วยงานที่ร่วมดำเนินงาน)</span></label>
-        <input type="text" id="partner_name" placeholder="เช่น บริษัท การไฟฟ้าส่วนภูมิภาค / มหาวิทยาลัยแม่ฟ้าหลวง / กรมป่าไม้" oninput="updatePreview()">
-        <div class="error-msg">กรุณากรอกองค์กรภาคี</div>
+        <label>ผู้รับผิดชอบโครงการ <span class="req">*</span><span class="hint">(สามารถกรอกได้มากกว่า 1 คน)</span></label>
+        <textarea id="lead_person" rows="2" placeholder="เช่น รศ.ดร.ชื่อ นามสกุล, ผศ.ดร.ชื่อ นามสกุล (คั่นด้วยเครื่องหมาย , หรือขึ้นบรรทัดใหม่)"></textarea>
+        <div class="error-msg">กรุณากรอกผู้รับผิดชอบ</div>
       </div>
-      <div class="field-row">
+
+      <!-- องค์กรภาคี แยกตามประเภท -->
+      <div style="margin-bottom:18px;">
+        <label style="margin-bottom:10px;font-size:13px;">องค์กรภาคี / พันธมิตร <span class="hint">(กรอกเฉพาะประเภทที่เกี่ยวข้อง ไม่จำเป็นต้องกรอกทุกช่อง)</span></label>
+      </div>
+      <div class="field-row" style="margin-bottom:14px;">
         <div class="field-group">
-          <label>ประเภทภาคี</label>
-          <select id="partner_type">
-            <option value="">-- เลือกประเภท --</option>
-            <option>ภาครัฐ (หน่วยงานราชการ)</option>
-            <option>ภาคเอกชน (บริษัท/วิสาหกิจ)</option>
-            <option>มหาวิทยาลัย/สถาบันการศึกษา</option>
-            <option>องค์กรระหว่างประเทศ</option>
-            <option>องค์กรไม่แสวงหากำไร / NGO</option>
-            <option>ชุมชน / วิสาหกิจชุมชน</option>
-          </select>
+          <label>🏛️ ภาครัฐ (หน่วยงานราชการ)</label>
+          <input type="text" id="partner_gov" placeholder="เช่น สำนักงานสาธารณสุขจังหวัด, กรมป่าไม้" oninput="updatePreview()">
         </div>
         <div class="field-group">
-          <label>ระดับความร่วมมือ</label>
-          <select id="partner_level">
-            <option value="">-- เลือก --</option>
-            <option>ระดับท้องถิ่น / จังหวัด</option>
-            <option>ระดับภูมิภาค (อีสาน)</option>
-            <option>ระดับชาติ</option>
-            <option>ระดับนานาชาติ</option>
-          </select>
+          <label>🏢 ภาคเอกชน (บริษัท/วิสาหกิจ)</label>
+          <input type="text" id="partner_private" placeholder="เช่น บริษัท HYAPSS จำกัด" oninput="updatePreview()">
         </div>
+      </div>
+      <div class="field-row" style="margin-bottom:14px;">
+        <div class="field-group">
+          <label>🎓 มหาวิทยาลัย / สถาบันการศึกษา</label>
+          <input type="text" id="partner_edu" placeholder="เช่น มหาวิทยาลัยแม่ฟ้าหลวง" oninput="updatePreview()">
+        </div>
+        <div class="field-group">
+          <label>🌏 องค์กรระหว่างประเทศ</label>
+          <input type="text" id="partner_intl" placeholder="เช่น UNESCO, UNDP" oninput="updatePreview()">
+        </div>
+      </div>
+      <div class="field-row" style="margin-bottom:14px;">
+        <div class="field-group">
+          <label>💚 องค์กรไม่แสวงหากำไร / NGO</label>
+          <input type="text" id="partner_ngo" placeholder="เช่น มูลนิธิสืบนาคะเสถียร" oninput="updatePreview()">
+        </div>
+        <div class="field-group">
+          <label>🏘️ ชุมชน / วิสาหกิจชุมชน</label>
+          <input type="text" id="partner_community" placeholder="เช่น วิสาหกิจชุมชนบ้านค้อ" oninput="updatePreview()">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>ระดับความร่วมมือ</label>
+        <select id="partner_level">
+          <option value="">-- เลือก --</option>
+          <option>ระดับท้องถิ่น / จังหวัด</option>
+          <option>ระดับภูมิภาค (อีสาน)</option>
+          <option>ระดับชาติ</option>
+          <option>ระดับนานาชาติ</option>
+        </select>
       </div>
       <div class="field-row">
         <div class="field-group">
@@ -231,6 +246,12 @@
           <label>มูลค่าทางเศรษฐกิจ</label>
           <input type="text" id="oc_value" placeholder="0">
           <div class="unit">บาท / ล้านบาท</div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e0eaf8;font-size:11px;line-height:1.6;">
+            <a href="https://sroi.kku.ac.th/login.html" target="_blank" style="color:var(--kku-teal);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+              🔗 คลิกเพื่อคำนวณมูลค่าทางเศรษฐกิจ
+            </a>
+            <div style="color:var(--kku-gray);margin-top:4px;">📞 สอบถามเพิ่มเติม: คุณกุลธิดา <a href="tel:0816628531" style="color:var(--kku-teal);font-weight:600;text-decoration:none;">081-662-8531</a></div>
+          </div>
         </div>
         <div class="outcome-card">
           <span class="oc-icon">🌿</span>
