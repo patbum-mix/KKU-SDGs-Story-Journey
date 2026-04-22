@@ -19,10 +19,18 @@ const sdgNames = {
 // ══════════════════════════════════════════════════════════
 // ⚠️ ใส่ URL จาก Google Apps Script Web App ตรงนี้
 // ══════════════════════════════════════════════════════════
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3CA_Xqgay603ZDkQt2Ja5DLg0CmvtHrDWjG-pIFKzbRXto32V_WGsjMmnkpXIGSsC/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWdtigg-6rvluKnH1iq7fv7X9F1_OikDagNHSAcLTpkSmP_4izYnewps3unxHWbDBr/exec';
 
 let selectedSdgs = [];
-let activityCounter = 0; // internal counter for unique IDs
+let activityCounter = 0;
+let editMode = false;
+let editSdgId = null;
+
+// ── LOGIN CHECK ──
+const currentUser = JSON.parse(sessionStorage.getItem('sdg_user') || 'null');
+if (!currentUser) {
+  window.location.href = 'login.html';
+}
 
 // ── TOAST NOTIFICATION ──
 function showToast(message, type = 'success') {
@@ -530,6 +538,11 @@ function collectAllData() {
   });
 
   return {
+    // Auth & Edit
+    username: currentUser ? currentUser.username : '',
+    action: editMode ? 'update' : 'save',
+    sdg_id: editSdgId || '',
+
     // Section 1: Basic Info
     mou_title: document.getElementById('mou_title').value,
     kku_unit: document.getElementById('kku_unit').value,
@@ -614,6 +627,12 @@ async function saveData() {
 
     if (result.status === 'success') {
       showToast('✅ ' + result.message, 'success');
+      // Redirect to dashboard after 2 seconds
+      setTimeout(() => {
+        if (confirm('ไปหน้า Dashboard?')) {
+          window.location.href = 'dashboard.html';
+        }
+      }, 1500);
     } else {
       showToast('❌ ' + (result.message || 'เกิดข้อผิดพลาด'), 'error');
       console.error('Save response:', result);
@@ -734,14 +753,132 @@ function clearAll() {
   showToast('ล้างข้อมูลเรียบร้อย');
 }
 
+// ── LOAD PROJECT FOR EDITING ──
+async function loadProjectForEdit(sdgId) {
+  try {
+    const url = GOOGLE_SCRIPT_URL + '?action=getProject&sdg_id=' + encodeURIComponent(sdgId);
+    const res = await fetch(url);
+    const result = await res.json();
+
+    if (result.status !== 'success' || !result.project) {
+      showToast('❌ โหลดโครงการไม่สำเร็จ', 'error');
+      return;
+    }
+
+    const p = result.project;
+
+    // Fill form fields
+    document.getElementById('mou_title').value = p.mou_title || '';
+    document.getElementById('kku_unit').value = p.kku_unit || '';
+    document.getElementById('lead_person').value = p.lead_person || '';
+    document.getElementById('partner_gov').value = p.partner_gov || '';
+    document.getElementById('partner_private').value = p.partner_private || '';
+    document.getElementById('partner_edu').value = p.partner_edu || '';
+    document.getElementById('partner_intl').value = p.partner_intl || '';
+    document.getElementById('partner_ngo').value = p.partner_ngo || '';
+    document.getElementById('partner_community').value = p.partner_community || '';
+    document.getElementById('partner_level').value = p.partner_level || '';
+    document.getElementById('mou_date').value = p.mou_date || '';
+    document.getElementById('mou_duration').value = p.mou_duration || '';
+    document.getElementById('mou_objective').value = p.mou_objective || '';
+    document.getElementById('oc_beneficiary').value = p.oc_beneficiary || '';
+    document.getElementById('oc_student').value = p.oc_student || '';
+    document.getElementById('oc_research').value = p.oc_research || '';
+    document.getElementById('oc_value').value = p.oc_value || '';
+    document.getElementById('oc_env').value = p.oc_env || '';
+    document.getElementById('oc_extend').value = p.oc_extend || '';
+    document.getElementById('key_achievement').value = p.key_achievement || '';
+    document.getElementById('spillover').value = p.spillover || '';
+    document.getElementById('quote_text').value = p.quote_text || '';
+    document.getElementById('quote_attr').value = p.quote_attr || '';
+    document.getElementById('sdg_explanation').value = p.sdg_explanation || '';
+    document.getElementById('story_title').value = p.story_title || '';
+    document.getElementById('story_problem').value = p.story_problem || '';
+    document.getElementById('story_action').value = p.story_action || '';
+    document.getElementById('story_result').value = p.story_result || '';
+    document.getElementById('story_link').value = p.story_link || '';
+    document.getElementById('story_img').value = p.story_img || '';
+
+    // SDGs
+    selectedSdgs = [];
+    document.querySelectorAll('.sdg-pick-btn').forEach(b => b.classList.remove('selected'));
+    if (p.selected_sdgs && p.selected_sdgs.length > 0) {
+      p.selected_sdgs.forEach(n => {
+        selectedSdgs.push(n);
+        const btn = document.querySelector('.sdg-' + n);
+        if (btn) btn.classList.add('selected');
+      });
+    }
+
+    // Activities
+    document.getElementById('activitiesList').innerHTML = '';
+    activityCounter = 0;
+    if (p.activities && p.activities.length > 0) {
+      p.activities.forEach(act => {
+        addActivity();
+        const items = document.querySelectorAll('#activitiesList .activity-item');
+        const lastItem = items[items.length - 1];
+        const inputs = lastItem.querySelectorAll('input[type="text"]');
+        const selects = lastItem.querySelectorAll('select');
+        if (inputs[0]) inputs[0].value = act.name || '';
+        if (inputs[1]) inputs[1].value = act.year || '';
+        if (inputs[2]) inputs[2].value = act.participants_result || '';
+        if (selects[0]) selects[0].value = act.phase || '';
+        if (selects[1]) selects[1].value = act.type || '';
+      });
+    } else {
+      addActivity();
+    }
+
+    updatePreview();
+    updateSdgPreview();
+    updateProgressSteps();
+
+    // Open all sections
+    ['sec1','sec2','sec3','sec4','sec5'].forEach(id => {
+      document.getElementById(id).classList.add('open');
+      document.getElementById('toggle-' + id).classList.add('open');
+    });
+
+    showToast('📂 โหลดข้อมูลโครงการ ' + sdgId + ' สำเร็จ');
+
+  } catch (error) {
+    console.error('Load error:', error);
+    showToast('❌ โหลดข้อมูลไม่สำเร็จ: ' + error.message, 'error');
+  }
+}
+
 // ── INIT ──
 window.onload = function () {
-  addActivity();
-  addActivity();
+  // Check URL params for edit/view mode
+  const params = new URLSearchParams(window.location.search);
+  const editId = params.get('edit');
+  const viewId = params.get('view');
+
+  if (editId) {
+    editMode = true;
+    editSdgId = editId;
+    // Change save button text
+    const saveBtn = document.querySelector('.btn-save');
+    if (saveBtn) saveBtn.innerHTML = '💾 บันทึกการแก้ไข';
+    // Change header title to show edit mode
+    const headerTitle = document.querySelector('.header-title');
+    if (headerTitle) headerTitle.innerHTML = '✏️ แก้ไขโครงการ<br><span>' + editId + '</span>';
+    // Load project data
+    loadProjectForEdit(editId);
+  } else if (viewId) {
+    editMode = false;
+    loadProjectForEdit(viewId).then(() => {
+      setTimeout(() => generateOutput(), 1000);
+    });
+  } else {
+    // Normal mode — add default activities
+    addActivity();
+    addActivity();
+  }
 
   // Open section 1 by default
   document.getElementById('sec1').classList.add('open');
   document.getElementById('toggle-sec1').classList.add('open');
-
   updateProgressSteps();
 };
