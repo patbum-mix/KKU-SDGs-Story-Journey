@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ดูโครงการทั้งหมด — SDGs Storytelling Journey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .dash-header{background:linear-gradient(135deg,#2980b9 0%,#1f6391 100%);padding:20px 0;position:relative;overflow:hidden;}
+    .dash-header::before{content:'';position:absolute;top:-40px;right:-60px;width:250px;height:250px;border-radius:50%;background:rgba(255,255,255,0.08);}
+    .dash-header-inner{max-width:960px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}
+    .dash-header-left h1{font-family:'Prompt',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:2px;}
+    .dash-header-left p{font-size:12px;color:rgba(255,255,255,0.7);}
+    .dash-user{display:flex;align-items:center;gap:12px;}
+    .dash-user-info{text-align:right;}
+    .dash-user-name{font-size:13px;font-weight:700;color:#fff;}
+    .dash-user-role{font-size:10px;color:rgba(255,255,255,0.6);}
+    .dash-logout{padding:8px 16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:white;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Sarabun',sans-serif;}
+    .dash-logout:hover{background:rgba(231,76,60,0.85);border-color:transparent;}
+    .dash-main{max-width:960px;margin:0 auto;padding:24px 20px 60px;}
+
+    .browse-banner{background:linear-gradient(135deg,#eaf4fb,#f4f9fd);border:1px solid #cfe5f5;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+    .browse-banner .icon{font-size:22px;}
+    .browse-banner .txt{font-size:13px;color:#1f6391;line-height:1.5;}
+    .browse-banner strong{color:#154866;}
+
+    .go-manage{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:linear-gradient(135deg,var(--kku-teal),#0a5c52);color:white;border:none;border-radius:10px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 14px rgba(13,122,110,0.3);}
+    .go-manage:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,122,110,0.4);}
+
+    .dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+    .dash-stat{background:white;border-radius:14px;padding:18px;text-align:center;border:1px solid var(--kku-border);box-shadow:var(--shadow-sm);}
+    .dash-stat .val{font-family:'Prompt',sans-serif;font-size:28px;font-weight:800;color:var(--kku-navy);}
+    .dash-stat .lbl{font-size:11px;color:var(--kku-gray);margin-top:4px;}
+
+    .filter-panel{background:white;border-radius:14px;padding:18px;border:1px solid var(--kku-border);box-shadow:var(--shadow-sm);margin-bottom:16px;}
+    .filter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+    .filter-group{flex:1;min-width:170px;}
+    .filter-group label{display:block;font-size:10px;font-weight:700;color:var(--kku-gray);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+    .filter-group input,.filter-group select{width:100%;padding:8px 12px;border:1.5px solid var(--kku-border);border-radius:8px;font-family:'Sarabun',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s;}
+    .filter-group input:focus,.filter-group select:focus{border-color:#2980b9;}
+    .filter-sdg-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;}
+    .filter-sdg-btn{width:32px;height:32px;border-radius:6px;border:none;cursor:pointer;font-size:10px;font-weight:800;color:white;opacity:0.35;transition:all 0.15s;}
+    .filter-sdg-btn:hover{opacity:0.7;transform:scale(1.1);}
+    .filter-sdg-btn.active{opacity:1;box-shadow:0 2px 8px rgba(0,0,0,0.25);transform:scale(1.1);}
+    .filter-reset{padding:8px 16px;background:var(--kku-light);border:1px solid var(--kku-border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;color:var(--kku-gray);transition:all 0.2s;align-self:flex-end;white-space:nowrap;}
+    .filter-reset:hover{background:#fff5f5;color:#e74c3c;border-color:#ffd7d7;}
+    .filter-count{font-size:12px;color:var(--kku-gray);margin-bottom:10px;padding:6px 0;}
+    .filter-count strong{color:var(--kku-navy);}
+
+    .dash-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+    .dash-toolbar h2{font-family:'Prompt',sans-serif;font-size:16px;font-weight:700;color:var(--kku-navy);}
+
+    .project-list{display:flex;flex-direction:column;gap:12px;}
+    .project-card{background:white;border-radius:14px;padding:20px;border:1px solid var(--kku-border);box-shadow:var(--shadow-sm);transition:all 0.2s;}
+    .project-card:hover{box-shadow:var(--shadow-md);}
+    .project-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+    .project-id{font-family:'Prompt',sans-serif;font-size:11px;font-weight:700;color:#2980b9;background:rgba(41,128,185,0.08);padding:3px 10px;border-radius:20px;}
+    .project-date{font-size:11px;color:var(--kku-gray);}
+    .project-title{font-family:'Prompt',sans-serif;font-size:15px;font-weight:700;color:var(--kku-navy);margin-bottom:6px;}
+    .project-meta{font-size:12px;color:var(--kku-gray);margin-bottom:10px;line-height:1.5;}
+    .project-owner{display:inline-block;font-size:10px;color:#2980b9;background:rgba(41,128,185,0.08);padding:2px 8px;border-radius:10px;margin-left:4px;}
+    .project-sdgs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;}
+    .project-sdg-tag{padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;color:white;}
+    .project-actions{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--kku-border);}
+    .btn-view{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;transition:all 0.2s;border:1.5px solid #d0e8f8;background:#f0f7ff;color:#2980b9;display:flex;align-items:center;gap:4px;}
+    .btn-view:hover{background:#2980b9;color:white;}
+
+    .empty-state{text-align:center;padding:60px 20px;color:var(--kku-gray);}
+    .empty-state .emoji{font-size:48px;margin-bottom:12px;display:block;}
+    .loading{text-align:center;padding:40px;color:var(--kku-gray);font-size:14px;}
+
+    @media(max-width:640px){
+      .dash-stats{grid-template-columns:1fr;}
+      .dash-header-inner{flex-direction:column;gap:12px;text-align:center;}
+      .dash-user{flex-direction:column;}.dash-user-info{text-align:center;}
+      .filter-row{flex-direction:column;}.filter-group{min-width:100%;}
+      .dash-toolbar{flex-direction:column;gap:12px;align-items:stretch;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="dash-header">
+  <div class="dash-header-inner">
+    <div class="dash-header-left">
+      <h1>🔍 ดูโครงการทั้งหมด</h1>
+      <p>โครงการ SDGs ของทุกหน่วยงาน — มหาวิทยาลัยขอนแก่น</p>
+    </div>
+    <div class="dash-user">
+      <div class="dash-user-info">
+        <div class="dash-user-name" id="userFaculty">-</div>
+        <div class="dash-user-role" id="userName">-</div>
+      </div>
+      <button class="dash-logout" onclick="logout()">🚪 ออกจากระบบ</button>
+    </div>
+  </div>
+</div>
+
+<div class="dash-main">
+  <div class="browse-banner">
+    <span class="icon">👁️</span>
+    <span class="txt"><strong>โหมดดูอย่างเดียว</strong> — คุณสามารถดูโครงการของทุกหน่วยงานเพื่อเป็นแนวทางในการกรอกของตัวเอง แต่ไม่สามารถแก้ไขได้ · หากต้องการจัดการโครงการของตัวเอง กดปุ่ม "จัดการโครงการของฉัน"</span>
+  </div>
+
+  <div class="dash-stats">
+    <div class="dash-stat"><div class="val" id="statTotal">-</div><div class="lbl">โครงการทั้งหมด</div></div>
+    <div class="dash-stat"><div class="val" id="statUnits">-</div><div class="lbl">หน่วยงาน/คณะ</div></div>
+    <div class="dash-stat"><div class="val" id="statSDGs">-</div><div class="lbl">SDGs ที่ครอบคลุม</div></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-panel">
+    <div class="filter-row">
+      <div class="filter-group" style="flex:2;">
+        <label>🔍 ค้นหาชื่อโครงการ</label>
+        <input type="text" id="filterSearch" placeholder="พิมพ์ชื่อโครงการ..." oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>🏫 คณะ / หน่วยงาน</label>
+        <select id="filterFaculty" onchange="applyFilters()"><option value="">ทั้งหมด</option></select>
+      </div>
+      <div class="filter-group" style="flex:0.6;">
+        <label>↕️ เรียงตาม</label>
+        <select id="filterSort" onchange="applyFilters()">
+          <option value="newest">ใหม่สุด</option>
+          <option value="oldest">เก่าสุด</option>
+          <option value="name-az">ชื่อ ก→ฮ</option>
+          <option value="name-za">ชื่อ ฮ→ก</option>
+          <option value="activities">กิจกรรมมากสุด</option>
+        </select>
+      </div>
+      <button class="filter-reset" onclick="resetFilters()">✕ ล้างตัวกรอง</button>
+    </div>
+    <div style="margin-top:10px;">
+      <label style="font-size:10px;font-weight:700;color:var(--kku-gray);text-transform:uppercase;letter-spacing:0.5px;">🌐 กรอง SDGs (คลิกเลือกได้หลายข้อ)</label>
+      <div class="filter-sdg-row" id="filterSdgRow"></div>
+    </div>
+  </div>
+
+  <div class="filter-count" id="filterCount"></div>
+
+  <div class="dash-toolbar">
+    <h2>📋 รายการโครงการทั้งหมด</h2>
+    <a href="login2.html" class="go-manage">✏️ จัดการโครงการของฉัน →</a>
+  </div>
+
+  <div class="project-list" id="projectList">
+    <div class="loading">⏳ กำลังโหลดข้อมูล...</div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbz3GW1VJu64Km4n9rypJGkpVUV67hJTUNVjgd6P4mC_xLfkzTocqQq1fVTcHf-sWgGz/exec';
+
+const sdgColors = {1:'#e5243b',2:'#dda63a',3:'#4c9f38',4:'#c5192d',5:'#ff3a21',6:'#26bde2',
+  7:'#fcc30b',8:'#a21942',9:'#fd6925',10:'#dd1367',11:'#fd9d24',12:'#bf8b2e',
+  13:'#3f7e44',14:'#0a97d9',15:'#56c02b',16:'#00689d',17:'#19486a'};
+
+let allProjects = [];
+let filterSdgs = [];
+
+const user = JSON.parse(sessionStorage.getItem('sdg_browse_user') || 'null');
+if (!user) {
+  window.location.href = 'login.html';
+} else {
+  document.getElementById('userFaculty').textContent = user.faculty_name;
+  document.getElementById('userName').textContent = '👤 ' + user.username;
+  buildSdgFilterButtons();
+  loadAllProjects();
+}
+
+function buildSdgFilterButtons() {
+  const row = document.getElementById('filterSdgRow');
+  for (let i = 1; i <= 17; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'filter-sdg-btn';
+    btn.style.background = sdgColors[i];
+    if (i === 7 || i === 11) btn.style.color = '#333';
+    btn.textContent = i;
+    btn.dataset.sdg = i;
+    btn.onclick = function() {
+      const n = parseInt(this.dataset.sdg);
+      const idx = filterSdgs.indexOf(n);
+      if (idx === -1) { filterSdgs.push(n); this.classList.add('active'); }
+      else { filterSdgs.splice(idx, 1); this.classList.remove('active'); }
+      applyFilters();
+    };
+    row.appendChild(btn);
+  }
+}
+
+async function loadAllProjects() {
+  try {
+    const res = await fetch(API_URL + '?action=getAllProjects');
+    const result = await res.json();
+    if (result.status === 'success') {
+      allProjects = result.projects;
+      buildFilterDropdowns();
+      updateStats(allProjects);
+      applyFilters();
+    } else {
+      document.getElementById('projectList').innerHTML = '<div class="empty-state"><span class="emoji">❌</span><p>' + result.message + '</p></div>';
+    }
+  } catch (error) {
+    document.getElementById('projectList').innerHTML = '<div class="empty-state"><span class="emoji">❌</span><p>โหลดข้อมูลไม่สำเร็จ: ' + error.message + '</p></div>';
+  }
+}
+
+function buildFilterDropdowns() {
+  const faculties = [...new Set(allProjects.map(p => p.kku_unit).filter(Boolean))].sort();
+  const fSel = document.getElementById('filterFaculty');
+  fSel.innerHTML = '<option value="">ทั้งหมด</option>' + faculties.map(f => '<option value="' + f + '">' + f + '</option>').join('');
+}
+
+function updateStats(projects) {
+  document.getElementById('statTotal').textContent = projects.length;
+  const unitSet = new Set(projects.map(p => p.kku_unit).filter(Boolean));
+  document.getElementById('statUnits').textContent = unitSet.size;
+  const sdgSet = new Set();
+  projects.forEach(p => { if (p.sdgs) p.sdgs.toString().split(',').forEach(s => { if (s.trim()) sdgSet.add(s.trim()); }); });
+  document.getElementById('statSDGs').textContent = sdgSet.size;
+}
+
+function applyFilters() {
+  const search = document.getElementById('filterSearch').value.trim().toLowerCase();
+  const faculty = document.getElementById('filterFaculty').value;
+  const sort = document.getElementById('filterSort').value;
+
+  let filtered = allProjects.filter(p => {
+    if (search && !(p.project_title || '').toLowerCase().includes(search) && !(p.sdg_id || '').toLowerCase().includes(search)) return false;
+    if (faculty && (p.kku_unit || '') !== faculty) return false;
+    if (filterSdgs.length > 0) {
+      const pSdgs = p.sdgs ? p.sdgs.toString().split(',').map(s => parseInt(s.trim())).filter(n => n > 0) : [];
+      if (!filterSdgs.some(s => pSdgs.includes(s))) return false;
+    }
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    switch (sort) {
+      case 'name-az': return (a.project_title || '').localeCompare(b.project_title || '', 'th');
+      case 'name-za': return (b.project_title || '').localeCompare(a.project_title || '', 'th');
+      case 'activities': return (parseInt(b.activity_count) || 0) - (parseInt(a.activity_count) || 0);
+      default: return 0;
+    }
+  });
+  if (sort === 'newest') filtered.reverse();
+
+  const hasFilter = search || faculty || filterSdgs.length > 0;
+  document.getElementById('filterCount').innerHTML = hasFilter
+    ? 'แสดง <strong>' + filtered.length + '</strong> จาก ' + allProjects.length + ' โครงการ'
+    : '';
+
+  renderProjectCards(filtered);
+}
+
+function resetFilters() {
+  document.getElementById('filterSearch').value = '';
+  document.getElementById('filterFaculty').value = '';
+  document.getElementById('filterSort').value = 'newest';
+  filterSdgs = [];
+  document.querySelectorAll('.filter-sdg-btn').forEach(b => b.classList.remove('active'));
+  applyFilters();
+}
+
+function renderProjectCards(projects) {
+  const listDiv = document.getElementById('projectList');
+  if (projects.length === 0) {
+    listDiv.innerHTML = '<div class="empty-state"><span class="emoji">📭</span><p>ไม่พบโครงการที่ตรงกับตัวกรอง</p></div>';
+    return;
+  }
+  listDiv.innerHTML = projects.map(p => {
+    const sdgTags = p.sdgs ? p.sdgs.toString().split(',').filter(s => s.trim()).map(s => {
+      const n = parseInt(s.trim());
+      return '<span class="project-sdg-tag" style="background:' + (sdgColors[n] || '#999') + '">' + n + '</span>';
+    }).join('') : '';
+    return '<div class="project-card">' +
+      '<div class="project-card-header"><span class="project-id">' + p.sdg_id + '</span><span class="project-date">' + p.timestamp + '</span></div>' +
+      '<div class="project-title">' + (p.project_title || 'ไม่ระบุชื่อ') + '</div>' +
+      '<div class="project-meta">🏫 ' + (p.kku_unit || '-') + ' · 👤 ' + (p.lead_person || '-') + ' · 📊 กิจกรรม ' + (p.activity_count || 0) + ' รายการ</div>' +
+      (sdgTags ? '<div class="project-sdgs">' + sdgTags + '</div>' : '') +
+      '<div class="project-actions">' +
+      '<button class="btn-view" onclick="viewProject(\'' + p.sdg_id + '\')">📄 ดู Story Card</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+function viewProject(sdgId) {
+  window.location.href = 'index-sdgs.html?view=' + sdgId;
+}
+
+function logout() {
+  sessionStorage.removeItem('sdg_browse_user');
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>
